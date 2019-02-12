@@ -16,17 +16,16 @@ std::ostream &operator <<(std::ostream &os, const std::vector<T> &v)
 class RandVector
 {
 private:
-	int _seed;
+	std::mt19937 _engine;
 public:
-	RandVector() : _seed(std::random_device{}()) {};
-	RandVector(int seed) : _seed(seed) {};
+	RandVector() : _engine(std::random_device{}()) {};
+	RandVector(int seed) : _engine(seed) {};
 
 	std::vector<int> uniform(int size, int min, int max)
 	{
-		std::mt19937 engine{_seed};
 		std::uniform_int_distribution<int> dist(min, max);
 		std::vector<int> v(size);
-		auto generator = [&dist, &engine](){return dist(engine);};
+		auto generator = [&dist, this](){return dist(_engine);};
 		std::generate(begin(v), end(v), generator);
 		return v;
 	}
@@ -58,19 +57,28 @@ public:
 	}
 	void window_permutation(std::vector<int> &vec, std::vector<int>::iterator left, std::vector<int>::iterator right, int permutations)
 	{
-		std::mt19937 engine{std::random_device{}()};
 		auto distance = std::distance(left, right);
 		std::uniform_int_distribution<int> dist(0, distance - 1); // permute on half open intrval [ )
 
 		for(int i=0; i<permutations; i++)
 		{
-			auto a = left + dist(engine);
-			auto b = left + dist(engine);
+			auto a = left + dist(_engine);
+			auto b = left + dist(_engine);
 			std::cout << a - vec.begin() << " <-> " << b - vec.begin() << " : " << *a << " <-> " << *b << std::endl;
 			std::iter_swap(a, b);
 
 		}
 	}
+	std::vector<int> locally_permuted_vector(int size, int min, int max, int window, int overlap, int permutations)
+	{
+		std::vector<int> vec = ordered(size, min, max);
+		sliding_window_permutation(vec, window, overlap, permutations);
+		std::reverse(vec.begin(), vec.end());
+		sliding_window_permutation(vec, window, overlap, permutations);
+		std::reverse(vec.begin(), vec.end());
+		return vec;
+	}
+private:
 	void sliding_window_permutation(std::vector<int> &vec, int window, int overlap, int permutations)
 	{
 		auto it = vec.begin();
@@ -84,22 +92,14 @@ public:
 		}
 		window_permutation(vec, it, vec.end(), permutations);
 	}
-	std::vector<int> locally_permuted_vector(int size, int min, int max, int window, int overlap, int permutations)
-	{
-		std::vector<int> vec = ordered(size, min, max);
-		sliding_window_permutation(vec, window, overlap, permutations);
-		std::reverse(vec.begin(), vec.end());
-		sliding_window_permutation(vec, window, overlap, permutations);
-		std::reverse(vec.begin(), vec.end());
-		return vec;
-	}
+
 };
 
 int main()
 {
 	RandVector rv;
 
-	std::vector<int> a = rv.locally_permuted_vector(1000, 0, 1000, 100, 50, 50);
+	std::vector<int> a = rv.locally_permuted_vector(100, 0, 100, 20, 10, 10);
 	std::cout << a << std::endl;
 
 }
