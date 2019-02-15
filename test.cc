@@ -3,59 +3,38 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include "quicksort.h"
 
-using namespace std;
+// template<class RandomIt >
+// void sort( RandomIt first, RandomIt last );
+// typedef void(sorter_type)()
 
-
-template<typename T>
-std::ostream &operator <<(std::ostream &os, const std::vector<T> &v)
-{
-	os << "( ";
-	for(auto &e: v) os << e << " ";
-	os << ")";
-	return os;
+template <typename T>
+std::ostream &operator<<(std::ostream &os, const std::vector<T> &v) {
+  os << "( ";
+  for (auto &e : v)
+    os << e << " ";
+  os << ")";
+  return os;
 }
 
-using namespace std;
+// template<typename T,
+// 		 typedef U  = std::vector<T>::iterator,
+// 		 void sorter(U u1, U u2)>
+// void call_sort(std::vector<T> &v) {
+//    sorter(v.begin(), v.end());
+// }
 
-class LongestConsec
-{
-public:
-    static std::string longestConsec(std::vector<std::string> &strarr, int k);
-};
-void insert(vector<string> &v, string element)
-{
-	vector<string>::iterator it = v.begin();
-	for(; it < v.end(); it++)
-	{
-  	if(element == *it)
-	{
-		return;
-	}
-	if(element.size() > (*it).size())
-	{
-		break;
-	}
-        }
-        v.insert(it, element);
-}
-std::string LongestConsec::longestConsec(vector<string> &strarr, int k)
-{
-  if(strarr.size() == 0 or k > strarr.size() or k <= 0)
-    return "";
-  vector<string> maxstrarr;
-  for(auto &e : strarr)
-  {
-  	insert(maxstrarr, e);
-  }
-  string res = std::accumulate(maxstrarr.begin(), maxstrarr.begin() + k, string(""));
-  return res;
+template<typename T,
+		 typename U,
+		 void sorter(U u1, U u2)>
+void call_sort(std::vector<T> &v) {
+   sorter(v.begin(), v.end());
 }
 
 int main()
 {
- vector<string> v{"abcde", "abcdefx", "abcdefx", "abcdefg", "abc", "a", "ab", "abcdefgh"};
- auto b = next(v.begin(), 2);
- // auto e = next(v.end(), -1);
- std::cout << *b << std::endl;
+	std::vector<int> v {9,8,7,6,5,4,3,2,1,0, 10};
+	call_sort<int, std::vector<int>::iterator, std::sort>(v);
+	std::cout << v << std::endl;
 }
