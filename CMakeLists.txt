@@ -12,4 +12,8 @@ project(quicksort LANGUAGES CXX)
 # target_link_libraries(bench PRIVATE Threads::Threads benchmark)
 
 
-add_executable(ranarray ranarray.cc)
+add_library(ranarray ranarray.cc ranarray.h)
+target_compile_features(ranarray PRIVATE cxx_std_17)
+
+add_executable(main testranarray.cc)
+target_link_libraries(main PRIVATE ranarray)
